@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doğum Günün Kutlu Olsun!</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: linear-gradient(to bottom, #87CEEB, #87CEFA); /* Gökyüzü mavisi */
+      font-family: 'Arial', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+      color: #fff;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 3em;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 5px #000;
+      animation: bounce 1s infinite alternate;
+    }
+
+    h2 {
+      font-size: 2em;
+      margin-top: 0;
+      text-shadow: 1px 1px 3px #000;
+      animation: fadeIn 2s ease-in forwards;
+      opacity: 0;
+    }
+
+    @keyframes bounce {
+      from { transform: translateY(0); }
+      to { transform: translateY(-20px); }
+    }
+
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Doğum Günün Kutlu Olsun Songüüll! 🎉</h1>
+  <h2>Nice mutlu yıllara!</h2>
+  <canvas id="confetti"></canvas>
+
+  <script>
+    const canvas = document.getElementById('confetti');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const confettiCount = 150;
+    const confetti = [];
+
+    function random(min, max) {
+      return Math.random() * (max - min) + min;
+    }
+
+    // Konfeti ve kalp objeleri oluştur
+    for (let i = 0; i < confettiCount; i++) {
+      confetti.push({
+        x: random(0, canvas.width),
+        y: random(-canvas.height, 0),
+        r: random(5, 10),
+        d: random(1, 5),
+        type: Math.random() < 0.9 ? 'confetti' : 'heart', // %10 kalp
+        color: `hsl(${Math.floor(random(0, 360))}, 100%, 50%)`,
+        tilt: random(-10, 10),
+        tiltAngleIncremental: random(0.05, 0.12),
+        tiltAngle: 0
+      });
+    }
+
+    function drawHeart(x, y, size) {
+      ctx.save();
+      ctx.fillStyle = 'red';
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.bezierCurveTo(x, y - size / 2, x - size, y - size / 2, x - size, y + size / 4);
+      ctx.bezierCurveTo(x - size, y + size, x, y + size * 1.5, x, y + size * 1.75);
+      ctx.bezierCurveTo(x, y + size * 1.5, x + size, y + size, x + size, y + size / 4);
+      ctx.bezierCurveTo(x + size, y - size / 2, x, y - size / 2, x, y);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      confetti.forEach(c => {
+        if (c.type === 'confetti') {
+          ctx.beginPath();
+          ctx.lineWidth = c.r;
+          ctx.strokeStyle = c.color;
+          ctx.moveTo(c.x + c.tilt + c.r / 2, c.y);
+          ctx.lineTo(c.x + c.tilt, c.y + c.tilt + c.r / 2);
+          ctx.stroke();
+        } else {
+          drawHeart(c.x, c.y, c.r);
+        }
+      });
+      update();
+    }
+
+    function update() {
+      confetti.forEach(c => {
+        c.tiltAngle += c.tiltAngleIncremental;
+        c.y += (Math.cos(c.d) + 3 + c.r / 2) / 2;
+        c.tilt = Math.sin(c.tiltAngle) * 15;
+
+        if (c.y > canvas.height) {
+          c.x = random(0, canvas.width);
+          c.y = random(-20, 0);
+          c.tilt = random(-10, 10);
+        }
+      });
+    }
+
+    setInterval(draw, 20);
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+  </script>
+</body>
+</html>
